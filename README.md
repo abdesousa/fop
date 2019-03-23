@@ -1,7 +1,42 @@
 
-# Faire Backend Exercise
+# Faire Backend Challenge
 
-### Details:
+### Solution
+
+##### Project Name: Faire Order Processing Batch (F.O.P)
+
+* ** Description **
+
+	Batch process to be responsible for processing the orders extracted from Faire API.
+
+* ** Technology stack **
+
+	Java 1.8, Spring batch, Spring boot, H2 database, JPA, RestTemplate
+
+* ** Project Author  **
+
+	Alexandre Barbosa de Sousa (abdesousa@gmail.com)
+	
+* ** LinkedIn Profile: **
+
+	https://www.linkedin.com/in/alexandre-sousa-17900813/
+
+
+##### Technical Decision:
+* What are the reasons to use a batch solution?
+
+	Once I have worked 7 years for a global company (B2C for ~1.5 million of representatives) where security and availability non functional requirements were the extremely high and the main requirements of this challenger are related to order processing where frontend isn't required, I realized a solution that can run in background not impacting the production environment. 
+
+* What are the reasons to use the spring batch?
+
+	Springbatch is a lightweight batch framework that can be used to develop robust solutions. You can use quartz or any other scheduler to trigger your processes. Additionally, you can control the sequence of 	execution defining steps which can work like a workflow.
+
+* What are the reasons to use the RestTemplate?
+
+	The usage of RestTemplate is recommended because is the easiest and effective way to consume REST Webservices using Spring framework.
+
+
+### Requirements - Details:
 
 Using the Faire API*1, you will write a program that accepts an API key as a single command line parameter, which should be sent with all requests in the X-FAIRE-ACCESS-TOKEN header, and does the following:
 
@@ -21,12 +56,6 @@ For testing, you can use the API key: HQLA9307HSLQYTC24PO2G0LITTIOHS2MJC8120PVZ8
 * 2 - We recommend using Tea Drops, brand token = b_d2481b88
 
 
-### Solution
 
-##### Project Name: Faire Order Processing Batch (F.O.P)
 
-* ** Description **: Batch process to be responsible for processing the orders extracted from Faire API.
-* ** Technology stack ** : Java 1.8, Spring batch, Spring boot, H2 database, JPA, RestTemplate
-
-* ** Project Author  **: Alexandre Barbosa de Sousa (abdesousa@gmail.com)
 

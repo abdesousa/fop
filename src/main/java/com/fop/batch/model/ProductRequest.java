@@ -2,7 +2,6 @@ package com.fop.batch.model;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -22,7 +21,6 @@ public class ProductRequest {
 
 	public ProductRequest() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	@JsonProperty("page")

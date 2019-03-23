@@ -17,14 +17,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.fop.batch.configuration.steps.listener.JobCompletionNotificationListener;
+import com.fop.batch.configuration.steps.reader.OrderItemReader;
+import com.fop.batch.configuration.steps.reader.ProductItemReader;
+import com.fop.batch.configuration.steps.writer.OrderItemWriter;
+import com.fop.batch.configuration.steps.writer.ProductItemWriter;
+import com.fop.batch.model.Order;
 import com.fop.batch.model.Product;
-import com.fop.batch.processor.JobCompletionNotificationListener;
-import com.fop.batch.processor.ProductItemProcessor;
-import com.fop.batch.reader.RESTProductReader;
-import com.fop.batch.reader.RESTProductWriter;
 
 /**
  * Configuration of the spring batch.
+ * Here are the configuration of the steps of this job process.
  * 
  * @author Alexandre Sousa(abdesousa@gmail.com)
  */
@@ -34,39 +37,60 @@ public class BatchConfiguration {
 
 	public static String JOB_NAME = "fop-batch";
 
-
 	@Autowired
 	public JobBuilderFactory jobBuilderFactory;
 
 	@Autowired
 	public StepBuilderFactory stepBuilderFactory;
 
-
-	@Bean
-	public ProductItemProcessor processor() {
-		return new ProductItemProcessor();
-	}
-
+	// readers and writer.
 	@Bean
 	public ItemReader<Product> reader() {
-		return new RESTProductReader();
-	}
-	
-	@Bean
-	public ItemWriter<Product> writer() {
-		return new RESTProductWriter();
-	}
-	
-	@Bean
-	public Job fopJob(JobCompletionNotificationListener listener, Step step1) {
-		return jobBuilderFactory.get(JOB_NAME).incrementer(new RunIdIncrementer()).listener(listener).flow(step1)
-				.end().build();
+		return new ProductItemReader();
 	}
 
 	@Bean
-	public Step step1(ItemWriter<Product> writer) {
-		return stepBuilderFactory.get("step1").<Product, Product>chunk(1).reader(reader()).processor(processor())
-				.writer(writer).build();
+	public ItemWriter<Product> writer() {
+		return new ProductItemWriter();
+	}
+
+	@Bean
+	public ItemReader<Order> orderReader() {
+		return new OrderItemReader();
+	}
+
+	@Bean
+	public ItemWriter<Order> orderWriter() {
+		return new OrderItemWriter();
+	}
+
+	@Bean
+	public Job fopJob(JobCompletionNotificationListener listener, Step stepUpdateInventory, Step stepUpdateOrderItemStatus) {
+		return jobBuilderFactory.get(JOB_NAME)
+					.incrementer(new RunIdIncrementer())
+					.listener(listener)
+					.start(stepUpdateInventory)
+					.next(stepUpdateOrderItemStatus)
+					.build();
+	}
+
+	// steps.
+	
+	// Consumes all products for a given brand*2, recording the inventory levels for each product option
+	@Bean
+	public Step stepUpdateInventory(ItemWriter<Product> writer) {
+		return stepBuilderFactory.get("stepUpdateInventory").<Product, Product>chunk(1).reader(reader()).writer(writer)
+				.build();
+	}
+
+	
+	 // Consumes all orders, accepting the order if there is inventory to fulfill the
+	 // order and it is not already accepted, otherwise it marks the items that don’t
+	 // have enough inventory as backordered
+	@Bean
+	public Step stepUpdateOrderItemStatus(ItemWriter<Product> writer) {
+		return stepBuilderFactory.get("stepUpdateOrderItemStatus").<Order, Order>chunk(1).reader(orderReader())
+				.writer(orderWriter()).build();
 	}
 
 }
